@@ -27,4 +27,11 @@ public class UserController {
         return "redirect:/";
     }
 
+    @PostMapping("/join")
+    public void join(String username, String password, String email) {
+        System.out.println(username);
+        System.out.println(password);
+        System.out.println(email);
+    }
+
 }
