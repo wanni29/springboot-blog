@@ -19,7 +19,7 @@ public class BoardController {
 
     @GetMapping("/board/1")
     public String detailForm() {
-        return "board/detail";
+        return "board/copy";
     }
 
 }
