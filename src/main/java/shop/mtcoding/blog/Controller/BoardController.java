@@ -1,8 +1,13 @@
 package shop.mtcoding.blog.Controller;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import shop.mtcoding.blog.dto.JoinDTO;
 
 @Controller
 public class BoardController {
