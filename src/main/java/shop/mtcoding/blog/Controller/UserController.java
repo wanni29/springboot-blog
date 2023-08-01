@@ -50,6 +50,12 @@ public class UserController {
             return "redirect:/40x";
         }
 
+        try {
+            userRepository.save(joinDTO);
+        } catch (Exception e) {
+            return "redirect:/50x";
+        }
+
         userRepository.save(joinDTO);
         return "redirect:/";
     }
