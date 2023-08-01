@@ -62,7 +62,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String logoutForm() {
-        session.invalidate(); // 세션 전체 무효화 (내 서랍을 비우는거)
+        session.invalidate(); // 세션 전체 무효화 (내 서랍을 )
         return "redirect:/";
     }
 

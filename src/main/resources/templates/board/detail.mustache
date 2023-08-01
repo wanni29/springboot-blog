@@ -3,7 +3,10 @@
   <!-- 수정삭제버튼 -->
   <div class="mb-5 d-flex justify-content-end">
     <button class="btn btn-warning me-1">수정</button>
-    <button class="btn btn-danger">삭제</button>
+    <form action="/product/delete" method="post">
+      <input type="hidden" class="form-control" values="{{id}}" name=>
+      <button type="submit" class="btn btn-danger">삭제</button>
+    </form>
   </div>
   <!-- 게시글내용 -->
   <div>
