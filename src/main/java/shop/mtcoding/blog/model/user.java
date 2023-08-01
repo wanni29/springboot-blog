@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "user_tb") //
 @Entity // ddl-auto 가 create
-public class user {
+public class User {
 
     @Id // 프라이머리 키 맥이고
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment

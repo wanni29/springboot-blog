@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.model.User;
 
 // BoardController, UserController, UserRepository
 // EntityManager, HttpSession
@@ -29,4 +31,16 @@ public class UserRepository {
         query.setParameter("email", joinDTO.getEmail());
         query.executeUpdate();
     }
+
+    // 모델로 받을수 없는것은 DTO 로 받아야 한다.
+    // 아이디를 틀리면 리턴이 안된다. 조회가 안되니 no entity found 라고 뜨는거다
+
+    public User findByUsernameAndPassword(LoginDTO loginDTO) {
+        Query query = em.createNativeQuery(
+                "select * from user_tb where username = :username and password = :password", User.class);
+        query.setParameter("username", loginDTO.getUsername());
+        query.setParameter("password", loginDTO.getPassword());
+        return (User) query.getSingleResult();
+    }
+
 }

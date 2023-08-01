@@ -1,11 +1,15 @@
 package shop.mtcoding.blog.Controller;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
 
 @Controller
@@ -13,6 +17,33 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private HttpSession session; // request 는 가방 session 서랍
+
+    @PostMapping("/login")
+    public String login(LoginDTO loginDTO) {
+
+        // validation check (유효성 검사) - 부가 로직
+        // 프레임 워크에서 걸러내는 기술이 있다.
+        // 지금은 적어보자
+        if (loginDTO.getUsername() == null || loginDTO.getUsername().isEmpty()) {
+            return "redirect:/40x";
+        }
+        if (loginDTO.getPassword() == null || loginDTO.getPassword().isEmpty()) {
+            return "redirect:/40x";
+        }
+
+        // 핵심 기능
+        try {
+            User user = userRepository.findByUsernameAndPassword(loginDTO);
+            session.setAttribute("sessionUser", user);
+            return "redirect:/";
+        } catch (Exception e) {
+            return "redirect:/exlogin";
+        }
+
+    }
 
     @GetMapping("/joinForm")
     public String joinForm() {
