@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -30,6 +31,34 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    @PostMapping("/board/{id}/update") // 수정할꺼야 ! 이 값으로 수정해!
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
+
+        // 1. 인증 검사
+
+        // 2. 권한 체크
+
+        // 3. 핵심 로직
+        // update board_tb set title = :title, content = :content where id = :id
+        boardRepository.update(updateDTO, id);
+
+        return "redirect:/board/" + id;
+
+    }
+
+    @GetMapping("/board/{id}/updateForm") // 수정하는 창을 보여줘
+    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
+        // 1. 인증 검사 (아이디에 대한 세션값이 필요한가 ? post맨으로 우회접근을 하면 필요하지 않을까 ? )
+
+        // 2. 권한 체크 (로그인한 아이디의 세션값과 게시글의 적힌 세션의 값이 동일한지 파악해야 하는가 ? )
+
+        // 3. 핵심 로직
+        Board board = boardRepository.findById(id);
+        request.setAttribute("board", board);
+
+        return "board/updateForm";
+    }
+
     @PostMapping("board/{id}/delete")
     public String delete(@PathVariable Integer id) {
         // 1. PathVariable 값 받기
@@ -41,13 +70,13 @@ public class BoardController {
         // 우회 접근을 했을 시
         User sessionUser = (User) session.getAttribute("sessionUser"); // 권한체크를 위한 세션 접근
         if (sessionUser == null) {
-            return "redirect:/loginForm";
+            return "redirect:/loginForm"; // 401
         }
 
         // 3. 권한 검사
         Board board = boardRepository.findById(id);
         if (board.getUser().getId() != sessionUser.getId()) {
-            return "redirect:/40x";
+            return "redirect:/40x"; // 403 권한 없음
         }
 
         // 4. 모델에 접근해서 삭제

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 
@@ -27,6 +28,17 @@ public class BoardRepository {
     // Object[] 로 리턴 됨.
     // object[0] = 1
     // object[1] = 제목1
+
+    @Transactional // 트랜잭션 성공 커밋, 실패하면 롤백
+    public void update(UpdateDTO updateDTO, Integer id) {
+        Query query = em.createNativeQuery(
+                "update board_tb set title = :title, content = :content where id = :id"); // createNativeQuery
+        query.setParameter("id", id);
+        query.setParameter("title", updateDTO.getTitle());
+        query.setParameter("content", updateDTO.getContent());
+        query.executeUpdate();
+
+    }
 
     public int count() {
         Query query = em.createNativeQuery("select count(*) from board_tb");
