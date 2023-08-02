@@ -1,5 +1,6 @@
 package shop.mtcoding.blog.repository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,6 +9,8 @@ import javax.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
@@ -18,6 +21,26 @@ public class BoardRepository {
 
     @Autowired
     private EntityManager em;
+
+    // select id, title from board_tb
+    // resultClass 안붙이고 직접 파싱하려면!!
+    // Object[] 로 리턴 됨.
+    // object[0] = 1
+    // object[1] = 제목1
+
+    public int count() {
+        Query query = em.createNativeQuery("select count(*) from board_tb");
+        // 원래는 object 배열로 리턴받는다, object 배열은 칼럼의 연속이다.
+        // 그룹함수를 써서, 하나의 칼럼을 조회 하면, object로 리턴된다.
+        BigInteger count = (BigInteger) query.getSingleResult();
+        return count.intValue();
+    }
+
+    public int count2() {
+        Query query = em.createNativeQuery(
+                "select * from board_tb", Board.class);
+        return (Integer) query.getMaxResults();
+    }
 
     @Transactional
     public void save(WriteDTO writeDTO, Integer userId) {
@@ -31,8 +54,8 @@ public class BoardRepository {
     }
 
     @Transactional
-    public void delete(int id) {
-        Query query = em.createNamedQuery(
+    public void deleteById(int id) {
+        Query query = em.createNativeQuery(
                 "delete from board_tb where id = :id");
         query.setParameter("id", id);
         query.executeUpdate();
@@ -54,6 +77,13 @@ public class BoardRepository {
                 "select * from board_tb", Board.class);
         List<Board> boardList = query.getResultList();
         return boardList;
+    }
+
+    public Board findById(Integer id) {
+        Query query = em.createNativeQuery("select * from board_tb where id = :id", Board.class);
+        query.setParameter("id", id);
+        Board board = (Board) query.getSingleResult();
+        return board;
     }
 
 }

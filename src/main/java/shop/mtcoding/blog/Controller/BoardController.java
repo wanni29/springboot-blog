@@ -30,18 +30,56 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
-    // localhost:8080 <= 널값
+    @PostMapping("board/{id}/delete")
+    public String delete(@PathVariable Integer id) {
+        // 1. PathVariable 값 받기
+
+        // 2. 인증 검사 (로그인 페이지 보내기)
+        // session에 접근 해서 sessionUser 키값을 가져오세요
+        // null 이면 로그인 페이지로 보내고
+        // null 아니면 3번을 실행하세요.
+        // 우회 접근을 했을 시
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 권한체크를 위한 세션 접근
+        if (sessionUser == null) {
+            return "redirect:/loginForm";
+        }
+
+        // 3. 권한 검사
+        Board board = boardRepository.findById(id);
+        if (board.getUser().getId() != sessionUser.getId()) {
+            return "redirect:/40x";
+        }
+
+        // 4. 모델에 접근해서 삭제
+        // boardRepository.deleteById(id); 호출하세요 ->deleteById(id);메소드를 만들때 리턴을 받지 마세요
+        // delete from board_tb where id = :id
+        boardRepository.deleteById(id);
+
+        return "redirect:/";
+    }
+
+    // localhost:8080 <= 널값 (왜 널값인데 ? Integer 클래스는 null 값이 허용되니깐)
     // 그래서 RequestParam(defaultValue = "0") 이거를 넣어서 기본값으로 만들어서
     // 널값이 안들어 가게 만든다.
     @GetMapping({ "/", "/board" })
     public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request) {
+        // 매개변수가 쿼리스트링이 되는구나..
 
         // 1. 유효성 검사 x
         // 2. 인증 검사 x
 
         // 값 검증이라는것을 해야한다. 바로 뷰에 뿌리면 안된다.
         // 뭘하든 request에 담는거다.
-        List<Board> boardList = boardRepository.findAll(page);
+        List<Board> boardList = boardRepository.findAll(page); // page = 1
+        int totalcount = boardRepository.count(); // totalCount = 5
+        int totalPage = totalcount / 3; // totalPage = 1
+
+        if (totalcount % 3 > 0) { //
+            totalPage = totalPage + 1; // totalPage = 2
+        }
+
+        boolean last = totalPage - 1 == page;
+
         System.out.println("테스트 : " + boardList.size());
         System.out.println("테스트 : " + boardList.get(0).getTitle());
 
@@ -49,7 +87,9 @@ public class BoardController {
         request.setAttribute("prevPage", page - 1);
         request.setAttribute("nextPage", page + 1);
         request.setAttribute("first", page == 0 ? true : false);
-        request.setAttribute("last", false);
+        request.setAttribute("last", last);
+        request.setAttribute("totalPage", totalPage);
+        request.setAttribute("totalcount", totalcount);
         // 이거를 트루로 만들수잇음 된다.
 
         return "index";
@@ -71,7 +111,22 @@ public class BoardController {
     // localhost:8080/board/1
     // localhost:8080/board/50
     @GetMapping("/board/{id}")
-    public String detailForm(@PathVariable Integer id) {
+    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 권한체크를 위한 세션 접근
+        Board board = boardRepository.findById(id);
+
+        boolean pageOwner = false; // null 값이 터지지 않도록 false
+        if (sessionUser != null) { // 로
+            System.out.println("테스트 세션 ID : " + sessionUser.getId());
+            System.out.println("테스트 세션 board.getUser().getId() : " + board.getUser().getId());
+
+            pageOwner = sessionUser.getId() == board.getUser().getId(); // 동일하면 true, 동일하지 않으면 false;
+            System.out.println("테스트 : pageOwner : " + pageOwner);
+
+        }
+        request.setAttribute("board", board);
+        request.setAttribute("pageOwner", pageOwner); // false => 내가 적은글이 아니야 !
         return "board/detail";
     }
 
