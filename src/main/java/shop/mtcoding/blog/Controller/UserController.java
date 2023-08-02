@@ -67,8 +67,16 @@ public class UserController {
     public String update(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
 
         // 1. 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 권한 체크를 위한 세션
+        if (sessionUser == null) {
+            return "redirect:/loginForm"; // 에러코드 401
+        }
 
         // 2. 권한 체크
+        User user = userRepository.findById(id);
+        if(user.getId() != sessionUser.getId()) {
+            return "redirect:/40x"; // 에러코드 403 권한 없음
+        }
 
         // 3. 핵심 로직
         userRepository.update(userUpdateDTO, id);
@@ -77,14 +85,23 @@ public class UserController {
     }
 
 
+    // post랑 get이랑 인증이랑 권한 동일한 부분 아닌가 ?  
     @GetMapping("/user/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
+
         // 1. 인증 검사
+        User sessionUser = (User) session.getAttribute("sessionUser"); // 권한 체크를 위한 세션
+        if (sessionUser == null) {
+            return "redirect:/loginForm"; // 에러코드 401
+        }
 
         // 2. 권한 체크
+        User user = userRepository.findById(id);
+        if(user.getId() != sessionUser.getId()) {
+            return "redirect:/40x";
+        }
 
         // 3. 핵심 로직
-        User user = userRepository.findById(id);
         request.setAttribute("USER", user);
 
         return "user/updateForm";
