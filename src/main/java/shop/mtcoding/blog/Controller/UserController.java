@@ -1,13 +1,17 @@
 package shop.mtcoding.blog.Controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
@@ -23,6 +27,16 @@ public class UserController {
 
     @Autowired
     private HttpSession session; // request 는 가방 session 서랍
+
+    // localhost:8080/check?username=ssar
+    @GetMapping("/check")
+    public ResponseEntity<String> check(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return new ResponseEntity<String>("유저네임이 중복 되었습니다.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<String>("유저네임을 사용할 수 있습니다.", HttpStatus.OK);
+    }
 
     @PostMapping("/login")
     public String login(LoginDTO loginDTO) {
@@ -74,18 +88,17 @@ public class UserController {
 
         // 2. 권한 체크
         User user = userRepository.findById(id);
-        if(user.getId() != sessionUser.getId()) {
+        if (user.getId() != sessionUser.getId()) {
             return "redirect:/40x"; // 에러코드 403 권한 없음
         }
 
         // 3. 핵심 로직
         userRepository.update(userUpdateDTO, id);
-        
+
         return "redirect:/";
     }
 
-
-    // post랑 get이랑 인증이랑 권한 동일한 부분 아닌가 ?  
+    // post랑 get이랑 인증이랑 권한 동일한 부분 아닌가 ?
     @GetMapping("/user/{id}/updateForm")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
 
@@ -97,7 +110,7 @@ public class UserController {
 
         // 2. 권한 체크
         User user = userRepository.findById(id);
-        if(user.getId() != sessionUser.getId()) {
+        if (user.getId() != sessionUser.getId()) {
             return "redirect:/40x";
         }
 
@@ -117,7 +130,6 @@ public class UserController {
     // 유효성 검사가 필요한 사람은 어떤사람일까?(공격자) 지정되지 않은 경로로 우회에서 오는 사람이 유효성검사가 필요하다.
     @PostMapping("/join")
     public String join(JoinDTO joinDTO) {
-
         // validation check (유효성 검사)
         if (joinDTO.getUsername() == null || joinDTO.getUsername().isEmpty()) {
             return "redirect:/40x";
@@ -128,15 +140,13 @@ public class UserController {
         if (joinDTO.getEmail() == null || joinDTO.getEmail().isEmpty()) {
             return "redirect:/40x";
         }
-
-        try {
-            userRepository.save(joinDTO);
-        } catch (Exception e) {
+        // DB에 해당 username이 있는지 체크해보기
+        User user = userRepository.findByUsername(joinDTO.getUsername());
+        if (user != null) { // 널이 아니라는것은 중복됐다는것
             return "redirect:/50x";
         }
-
-        userRepository.save(joinDTO);
-        return "redirect:/";
+        userRepository.save(joinDTO); // 핵심 기능
+        return "redirect:/loginForm";
     }
 
     // @PostMapping("/join")

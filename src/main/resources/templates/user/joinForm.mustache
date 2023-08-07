@@ -1,17 +1,15 @@
 {{> /layout/header}}
 <div class="container p-5">
-
-  <!--form 태그는 디폴트값이 get 이다. 적지않으면 method는 get으로 처리-->
-  <!-- 요청을 하면 localhost:8080/login POST 요청됨 -->
-  <!--username=사용자입력값&password=사용자값-->
-  <!-- 사용자입력은 value 에들어간다. -->
-  <!-- form 태그에 있는 값들을 한번에 전송할때 submit 버튼을 이용한다-->
-  <form action="/join" method="post" enctype="application/x-www-form-urlencoded">
-    <div class="card">
-      <div class="card-header"><b>회원가입을 해주세요</b></div>
-      <div class="card-body">
+  <!-- 요청을 하면 localhost:8080/join POST로 요청됨
+    username=사용자입력값&password=사용자값&email=사용자입력값 -->
+  <div class="card">
+    <div class="card-header"><b>회원가입을 해주세요</b></div>
+    <div class="card-body">
+      <form action="/join" method="POST" enctype="application/x-www-form-urlencoded" onsubmit="return valid()">
         <div class="mb-3">
-          <input type="text" class="form-control" placeholder="Enter username" name="username" required maxlength="20">
+          <input type="text" id="username" class="form-control" placeholder="Enter username" name="username" required
+            maxlength="20" onchange="usernameChange()">
+          <button type="button" onclick="check()">중복체크</button>
         </div>
         <div class="mb-3">
           <input type="password" class="form-control" placeholder="Enter password" name="password" required
@@ -20,9 +18,49 @@
         <div class="mb-3">
           <input type="email" class="form-control" placeholder="Enter email" name="email" required maxlength="20">
         </div>
-        <button type="submit" class="btn btn-primary form-control">회원가입</button>
-      </div>
+        <button id="btnJoin" type="submit" class="btn btn-primary form-control">회원가입</button>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
+<script>
+  let usernameSameCheck = false; // 중복체크를 아직 하지 않았다.
+  function usernameChange() { // 중복체크를 해서 200 이 떨어졌을 때 true 값으로 변경해야한다.
+    console.log("변경됨");
+    usernameSameCheck = false;
+  }
+  function valid() {
+    if (usernameSameCheck) {
+      return true;
+    } else {
+      alert("유저네임 중복체크를 해주세요");
+      return false;
+    }
+  }
+  // 책임 : input태그로 부터 username을 가져와서 통신을 요청하고, 중복이 되었는지 확인한다.
+  async function check() {
+    // 1. DOM으로 부터 값 가져오기
+    let username = document.querySelector("#username").value;
+    //console.log("유저네임", username);
+    // 2. 통신하기
+    // 이벤트 루프에 등록된다.
+    // 원래라면 얘를 이벤트 큐에 등록하고 밑으로 쭉쭉 내려간다.
+    // 하지만 await를 붙이게 되면 값이 response에 담길때까지 기다려라는 뜻이다.
+    // async 는 비동기라는 뜻
+    // await를 붙이지 않으면 그냥 쑥 내려오는거임
+    let response = await fetch(`/check?username=${username}`);
+    // 3. 파싱하기
+    let responseBody = await response.text(); // response.json();
+    console.log(responseBody);
+    // 4. 상태코드 확인
+    let btnJoin = document.querySelector("#btnJoin");
+    if (response.status == 200) {// 중복이 안됬다는거
+      alert(responseBody);
+      usernameSameCheck = true;
+    } else { // 중복이 됬다는거 
+      alert(responseBody);
+      usernameSameCheck = false;
+    }
+  }
+</script>
 {{> /layout/footer}}

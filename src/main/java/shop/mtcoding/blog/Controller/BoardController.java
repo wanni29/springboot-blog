@@ -42,7 +42,7 @@ public class BoardController {
 
         // 2. 권한 체크
         Board board = boardRepository.findById(id);
-        if(board.getUser().getId() != sessionUser.getId()) {
+        if (board.getUser().getId() != sessionUser.getId()) {
             return "redirect:/40x";
         }
 
@@ -64,7 +64,7 @@ public class BoardController {
 
         // 2. 권한 체크 (로그인한 아이디의 세션값과 게시글의 적힌 세션의 값이 동일한지 파악해야 하는가 ? )
         Board board = boardRepository.findById(id);
-        if(board.getUser().getId() != sessionUser.getId()) {
+        if (board.getUser().getId() != sessionUser.getId()) {
             return "redirect:/40x";
         }
 
@@ -124,8 +124,8 @@ public class BoardController {
 
         boolean last = totalPage - 1 == page;
 
-        System.out.println("테스트 : " + boardList.size());
-        System.out.println("테스트 : " + boardList.get(0).getTitle());
+        // System.out.println("테스트 : " + boardList.size());
+        // System.out.println("테스트 : " + boardList.get(0).getTitle());
 
         request.setAttribute("boardList", boardList);
         request.setAttribute("prevPage", page - 1);

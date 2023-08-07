@@ -22,6 +22,17 @@ public class UserRepository {
     @Autowired
     private EntityManager em;
 
+    public User findByUsername(String username) {
+        try {
+            Query query = em.createNativeQuery(
+                    "select * from user_tb where username = :username", User.class);
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Transactional
     public void update(UserUpdateDTO userUpdateDTO, Integer id) {
         Query query = em.createNativeQuery(
@@ -29,20 +40,24 @@ public class UserRepository {
         query.setParameter("id", id);
         query.setParameter("password", userUpdateDTO.getPassword());
         query.executeUpdate();
-        System.out.println("데이터가 정확히 들어갔다면 이 문장이 출력됩니다.");
-        System.out.println("h2-console로 넘어가서 데이터 값의 변화를 확인하세요.");
+        // System.out.println("데이터가 정확히 들어갔다면 이 문장이 출력됩니다.");
+        // System.out.println("h2-console로 넘어가서 데이터 값의 변화를 확인하세요.");
 
     }
 
     @Transactional
     public void save(JoinDTO joinDTO) {
         // EntityManager가 :usernmae으로 바인딩 하게 한다.
+        System.out.println("테스트 : " + 1);
         Query query = em.createNativeQuery(
                 "insert into user_tb(username, password, email) values(:username, :password, :email)"); // createNativeQuery
+        System.out.println("테스트 : " + 2);
         query.setParameter("username", joinDTO.getUsername());
         query.setParameter("password", joinDTO.getPassword());
         query.setParameter("email", joinDTO.getEmail());
-        query.executeUpdate();
+        System.out.println("테스트 : " + 3);
+        query.executeUpdate(); // 쿼리전송하는 역할 (DBMS) // DB는 하드디스크야!
+        System.out.println("테스트 : " + 4);
     }
 
     // 모델로 받을수 없는것은 DTO 로 받아야 한다.
