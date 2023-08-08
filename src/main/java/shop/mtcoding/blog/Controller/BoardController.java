@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import shop.mtcoding.blog.dto.BoardDetailDTO;
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
+import shop.mtcoding.blog.model.Reply;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.BoardRepository;
+import shop.mtcoding.blog.repository.ReplyRepository;
 
 @Controller
 public class BoardController {
@@ -30,6 +34,23 @@ public class BoardController {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    private ReplyRepository replyRepository;
+
+    @ResponseBody
+    @GetMapping("/test/board/2")
+    public List<Reply> test2() {
+        List<Reply> replys = replyRepository.findByBoardId(1);
+        return replys;
+    }
+
+    @ResponseBody
+    @GetMapping("/test/board/1")
+    public Board test() {
+        Board board = boardRepository.findById(1);
+        return board;
+    }
 
     @PostMapping("/board/{id}/update") // 수정할꺼야 ! 이 값으로 수정해!
     public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
@@ -158,18 +179,20 @@ public class BoardController {
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
 
         User sessionUser = (User) session.getAttribute("sessionUser"); // 권한체크를 위한 세션 접근
-        Board board = boardRepository.findById(id);
+        List<BoardDetailDTO> dtos = boardRepository.findByIdJoinReply(id);
 
-        boolean pageOwner = false; // null 값이 터지지 않도록 false
-        if (sessionUser != null) { // 로
-            System.out.println("테스트 세션 ID : " + sessionUser.getId());
-            System.out.println("테스트 세션 board.getUser().getId() : " + board.getUser().getId());
+        boolean pageOwner = false;
+        if (sessionUser != null) {
+            // System.out.println("테스트 세션 ID : " + sessionUser.getId());
+            // System.out.println("테스트 세션 board.getUser().getId() : " +
+            // replys.get(0).getUser().getId());
 
-            pageOwner = sessionUser.getId() == board.getUser().getId(); // 동일하면 true, 동일하지 않으면 false;
-            System.out.println("테스트 : pageOwner : " + pageOwner);
+            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId(); // 동일하면 true,
+            // 동일하지 않으면 false;
+            // System.out.println("테스트 : pageOwner : " + pageOwner);
 
         }
-        request.setAttribute("board", board);
+        request.setAttribute("dtos", dtos);
         request.setAttribute("pageOwner", pageOwner); // false => 내가 적은글이 아니야 !
         return "board/detail";
     }
