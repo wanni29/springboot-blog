@@ -7,3 +7,9 @@ insert into board_tb(title, content, user_id, created_at) values('제목4', '내
 insert into board_tb(title, content, user_id, created_at) values('제목6', '내용5', 2, now());
 insert into board_tb(title, content, user_id, created_at) values('제목7', '내용5', 2, now());
 insert into board_tb(title, content, user_id, created_at) values('제목8', '내용5', 2, now());
+insert into reply_tb(comment, user_id, board_id) values('댓글1', 1, 3);
+insert into reply_tb(comment, user_id, board_id) values('댓글2', 1, 3);
+insert into reply_tb(comment, user_id, board_id) values('댓글3', 2, 3);
+insert into reply_tb(comment, user_id, board_id) values('댓글4', 2, 3);
+insert into reply_tb(comment, user_id, board_id) values('댓글5', 2, 3);
+insert into reply_tb(comment, user_id, board_id) values('댓글6', 2, 3);
