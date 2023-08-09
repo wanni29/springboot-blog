@@ -177,21 +177,19 @@ public class BoardController {
     // localhost:8080/board/50
     @GetMapping("/board/{id}")
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
-
         User sessionUser = (User) session.getAttribute("sessionUser"); // 권한체크를 위한 세션 접근
-        List<BoardDetailDTO> dtos = boardRepository.findByIdJoinReply(id);
+        List<BoardDetailDTO> dtos = null;
+        if (sessionUser == null) {
+            dtos = boardRepository.findByIdJoinReply(id, null);
+        } else {
+            dtos = boardRepository.findByIdJoinReply(id, sessionUser.getId());
+        }
 
         boolean pageOwner = false;
         if (sessionUser != null) {
-            // System.out.println("테스트 세션 ID : " + sessionUser.getId());
-            // System.out.println("테스트 세션 board.getUser().getId() : " +
-            // replys.get(0).getUser().getId());
-
-            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId(); // 동일하면 true,
-            // 동일하지 않으면 false;
-            // System.out.println("테스트 : pageOwner : " + pageOwner);
-
+            pageOwner = sessionUser.getId() == dtos.get(0).getBoardUserId();
         }
+
         request.setAttribute("dtos", dtos);
         request.setAttribute("pageOwner", pageOwner); // false => 내가 적은글이 아니야 !
         return "board/detail";

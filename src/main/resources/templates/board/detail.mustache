@@ -42,9 +42,12 @@
           <div class="px-1 me-1 bg-primary text-white rounded">{{replyUserUsername}}</div>
           <div>{{replyComment}}</div>
         </div>
+        {{#replyOwner}}
         <form action="/reply/{{replyId}}/delete" method="post">
+          <input type="hidden" name="boardId" value="{{boardId}}" />
           <button class="btn">:휴지통:</button>
         </form>
+        {{/replyOwner}}
       </div>
       {{/replyId}}
       {{/dtos}}

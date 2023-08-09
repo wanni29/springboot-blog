@@ -20,7 +20,6 @@ import lombok.Setter;
 @Entity
 public class Reply {
 
-    @JoinColumn(name = "user_id") // 내가 키의 이름을 직접 설정할수있음
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -90,7 +90,7 @@ public class BoardRepository {
         return boardList;
     }
 
-    public List<BoardDetailDTO> findByIdJoinReply(Integer boardId) {
+    public List<BoardDetailDTO> findByIdJoinReply(Integer boardId, Integer sessionUserId) {
         String sql = "select ";
         sql += "b.id board_id, ";
         sql += "b.content board_content, ";
@@ -99,7 +99,16 @@ public class BoardRepository {
         sql += "r.id reply_id, ";
         sql += "r.comment reply_comment, ";
         sql += "r.user_id reply_user_id, ";
-        sql += "ru.username reply_user_username ";
+        sql += "ru.username reply_user_username, ";
+        if (sessionUserId == null) {
+            sql += "false reply_owner ";
+        } else {
+            sql += "case when r.user_id = :sessionUserId then true else false end reply_owner ";
+            // sessionUserId 가 있을경우에
+            // reply_user_id 와 sessionUserId 가 같다면 true를 갖게되고
+            // 그게 아니라면 false값을 가지게 된다.
+        }
+
         sql += "from board_tb b left outer join reply_tb r ";
         sql += "on b.id = r.board_id ";
         sql += "left outer join user_tb ru ";
@@ -108,6 +117,10 @@ public class BoardRepository {
         sql += "order by r.id desc";
         Query query = em.createNativeQuery(sql);
         query.setParameter("boardId", boardId);
+
+        if (sessionUserId != null) {
+            query.setParameter("sessionUserId", sessionUserId);
+        }
 
         JpaResultMapper mapper = new JpaResultMapper();
         List<BoardDetailDTO> dtos = mapper.list(query, BoardDetailDTO.class);
