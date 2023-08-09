@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +52,23 @@ public class UserController {
             return "redirect:/40x";
         }
 
-        // 핵심 기능
-        try {
-            User user = userRepository.findByUsernameAndPassword(loginDTO);
+        User user = userRepository.findByUsername(loginDTO.getUsername());
+        if (BCrypt.checkpw(loginDTO.getPassword(), user.getPassword())) {
             session.setAttribute("sessionUser", user);
+            System.out.println("테스트 : validtion OK");
             return "redirect:/";
-        } catch (Exception e) {
-            return "redirect:/exlogin";
+        } else {
+            return "redirect:/user/loginForm";
         }
+
+        // 핵심 기능
+        // try {
+        // User user = userRepository.findByUsernameAndPassword(loginDTO);
+        // session.setAttribute("sessionUser", user);
+        // return "redirect:/";
+        // } catch (Exception e) {
+        // return "redirect:/exlogin";
+        // }
 
     }
 
