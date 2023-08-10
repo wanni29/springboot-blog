@@ -139,6 +139,11 @@ public class BoardController {
             @RequestParam(defaultValue = "0") Integer page,
             HttpServletRequest request) {
 
+        System.out.println("테스트 : keyword : " + keyword);
+        System.out.println("테스트 : keyword length : " + keyword.length());
+        System.out.println("테스트 : keyword isEmpty : " + keyword.isEmpty());
+        System.out.println("테스트 : keyword isBlank : " + keyword.isBlank());
+
         List<Board> boardList = null;
         int totalcount = 0;
         request.setAttribute("keyword", keyword);
