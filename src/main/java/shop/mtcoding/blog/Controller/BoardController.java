@@ -134,12 +134,14 @@ public class BoardController {
     // 그래서 RequestParam(defaultValue = "0") 이거를 넣어서 기본값으로 만들어서
     // 널값이 안들어 가게 만든다.
     @GetMapping({ "/", "/board" })
-    public String index(String keyword,
+    public String index(
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") Integer page,
             HttpServletRequest request) {
 
         List<Board> boardList = null;
         int totalcount = 0;
+        request.setAttribute("keyword", keyword);
         if (keyword == null) {
             boardList = boardRepository.findAll(page);
             totalcount = boardRepository.count();
@@ -156,14 +158,8 @@ public class BoardController {
         boolean last = totalPage - 1 == page;
 
         request.setAttribute("boardList", boardList);
-        if (keyword == null) {
-            request.setAttribute("prevPage", page - 1);
-            request.setAttribute("nextPage", page + 1);
-        } else {
-            request.setAttribute("prevPage", page - 1 + "&keyword=" + keyword);
-            request.setAttribute("nextPage", page + 1 + "&keyword=" + keyword);
-        }
-
+        request.setAttribute("prevPage", page - 1);
+        request.setAttribute("nextPage", page + 1);
         request.setAttribute("first", page == 0 ? true : false);
         request.setAttribute("last", last);
         request.setAttribute("totalPage", totalPage);
