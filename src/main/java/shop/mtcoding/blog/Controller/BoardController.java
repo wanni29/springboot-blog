@@ -39,6 +39,13 @@ public class BoardController {
     private ReplyRepository replyRepository;
 
     @ResponseBody
+    @GetMapping("/test/count")
+    public String testcount() {
+        int count = boardRepository.count("2");
+        return count + "";
+    }
+
+    @ResponseBody
     @GetMapping("/test/board/2")
     public List<Reply> test2() {
         List<Reply> replys = replyRepository.findByBoardId(1);
@@ -127,35 +134,40 @@ public class BoardController {
     // 그래서 RequestParam(defaultValue = "0") 이거를 넣어서 기본값으로 만들어서
     // 널값이 안들어 가게 만든다.
     @GetMapping({ "/", "/board" })
-    public String index(@RequestParam(defaultValue = "0") Integer page, HttpServletRequest request) {
-        // 매개변수가 쿼리스트링이 되는구나..
+    public String index(String keyword,
+            @RequestParam(defaultValue = "0") Integer page,
+            HttpServletRequest request) {
 
-        // 1. 유효성 검사 x
-        // 2. 인증 검사 x
+        List<Board> boardList = null;
+        int totalcount = 0;
+        if (keyword == null) {
+            boardList = boardRepository.findAll(page);
+            totalcount = boardRepository.count();
+        } else {
+            boardList = boardRepository.findAll(page, keyword);
+            totalcount = boardRepository.count(keyword);
+        }
 
-        // 값 검증이라는것을 해야한다. 바로 뷰에 뿌리면 안된다.
-        // 뭘하든 request에 담는거다.
-        List<Board> boardList = boardRepository.findAll(page); // page = 1
-        int totalcount = boardRepository.count(); // totalCount = 5
-        int totalPage = totalcount / 3; // totalPage = 1
-
-        if (totalcount % 3 > 0) { //
-            totalPage = totalPage + 1; // totalPage = 2
+        int totalPage = totalcount / 3;
+        if (totalcount % 3 > 0) {
+            totalPage = totalPage + 1;
         }
 
         boolean last = totalPage - 1 == page;
 
-        // System.out.println("테스트 : " + boardList.size());
-        // System.out.println("테스트 : " + boardList.get(0).getTitle());
-
         request.setAttribute("boardList", boardList);
-        request.setAttribute("prevPage", page - 1);
-        request.setAttribute("nextPage", page + 1);
+        if (keyword == null) {
+            request.setAttribute("prevPage", page - 1);
+            request.setAttribute("nextPage", page + 1);
+        } else {
+            request.setAttribute("prevPage", page - 1 + "&keyword=" + keyword);
+            request.setAttribute("nextPage", page + 1 + "&keyword=" + keyword);
+        }
+
         request.setAttribute("first", page == 0 ? true : false);
         request.setAttribute("last", last);
         request.setAttribute("totalPage", totalPage);
         request.setAttribute("totalcount", totalcount);
-        // 이거를 트루로 만들수잇음 된다.
 
         return "index";
 

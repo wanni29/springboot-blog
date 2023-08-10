@@ -6,20 +6,23 @@
   <!--username=사용자입력값&password=사용자값-->
   <!-- 사용자입력은 value 에들어간다. -->
   <!-- form 태그에 있는 값들을 한번에 전송할때 submit 버튼을 이용한다-->
-  <form action="/user/{{USER.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
+  <form action="/user/{{user.id}}/update" method="post" enctype="application/x-www-form-urlencoded">
     <div class="card">
       <div class="card-header"><b>회원정보를 수정해주세요</b></div>
       <div class="card-body">
         <div class="mb-3">
-          <input type="text" class="form-control" placeholder="{{USER.username}}" name="username" value="{{USER.username}}" disabled>
+          <input type="text" class="form-control" placeholder="{{user.username}}" name="username"
+            value="{{user.username}}" disabled>
         </div>
         <div class="mb-3">
-          <input type="password" class="form-control" placeholder="수정할 비밀번호를 입력해주세요" name="password" value="{{USER.password}}">
+          <input type="password" id="myPassword" class="form-control" placeholder="수정할 비밀번호를 입력해주세요" name="password"
+            value="{{user.password}}">
         </div>
         <div class="mb-3">
-          <input type="email" class="form-control" placeholder="{{USER.email}}" name="email" value="{{USER.email}}" disabled>
+          <input type="email" class="form-control" placeholder="{{user.email}}" name="email" value="{{user.email}}"
+            disabled>
         </div>
-        <button type="submit" class="btn btn-primary">회원정보수정</button>
+        <button type="submit" id="myBtn" class="btn btn-primary">회원정보수정</button>
       </div>
     </div>
   </form>

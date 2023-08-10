@@ -3,6 +3,13 @@
 <br>
 <div class="container p-5">
 
+  <div class="mb-2 d-flex justify-content-end">
+    <form class="d-flex" action="/" method="get">
+      <input class="form-control me-2" action type="text" name="keyword" placeholder="Serach" required>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+  </div>
+
   {{#boardList}}
   <div class="card mb-4">
     <div class="card-body">
@@ -15,11 +22,11 @@
   <br>
   <br>
 
-<!--disable-->
+  <!--disable-->
   <ul class="pagination d-flex justify-content-center">
-    <li class="page-item {{#first}}disabled{{/first}}" ><a class="page-link" href="?page={{prevPage}}">Previous</a></li> 
+    <li class="page-item {{#first}}disabled{{/first}}"><a class="page-link" href="?page={{prevPage}}">Previous</a></li>
     <!--서버사이드랜더링-->
     <li class="page-item {{#last}}disabled{{/last}}"><a class="page-link" href="?page={{nextPage}}">Next</a></li>
   </ul>
-<!--라스트 페이지 ->  퍼스트 페이지 -> 0 -->
+  <!--라스트 페이지 ->  퍼스트 페이지 -> 0 -->
   {{> /layout/footer}}

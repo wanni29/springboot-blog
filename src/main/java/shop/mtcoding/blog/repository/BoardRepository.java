@@ -47,6 +47,13 @@ public class BoardRepository {
         return count.intValue();
     }
 
+    public int count(String keyword) {
+        Query query = em.createNativeQuery("select count(*) from board_tb where title like :keyword");
+        query.setParameter("keyword", "%" + keyword + "%");
+        BigInteger count = (BigInteger) query.getSingleResult();
+        return count.intValue();
+    }
+
     public int count2() {
         Query query = em.createNativeQuery(
                 "select * from board_tb", Board.class);
@@ -80,6 +87,16 @@ public class BoardRepository {
         Query query = em.createNativeQuery("select * from board_tb order by id desc limit :page, :size", Board.class);
         query.setParameter("page", page * SIZE); // 0 들어오면 1부터 3 / 1들어오면 2부터 4 ... // 근데 오더 바이 해서 숫자는 거꾸로
         query.setParameter("size", SIZE);
+        return query.getResultList();
+    }
+
+    public List<Board> findAll(int page, String keyword) {
+        final int SIZE = 3;
+        Query query = em.createNativeQuery(
+                "select * from board_tb where title like :keyword order by id desc limit :page, :size", Board.class);
+        query.setParameter("page", page * SIZE);
+        query.setParameter("size", SIZE);
+        query.setParameter("keyword", "%" + keyword + "%");
         return query.getResultList();
     }
 
